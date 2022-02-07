@@ -13,8 +13,8 @@
 #include <complex>
 #include "mandlebrot.h"
 
-constexpr int                       numThreads{6};
-std::array<std::thread,numThreads>  theThreads;
+constexpr int                           numThreads{6};
+std::array<std::thread,numThreads+1>    theThreads;
 
 
 struct Box
@@ -53,39 +53,14 @@ int iterate(Point const &c)
     }
 
     return 0;
-
 }
 
 void mandlebrot(int startRow)
 {
-    // quarter resolution
-    for(int row=startRow;row<dim;row+=numThreads)
-    {
-        for(int column=0;column<dim;column+=4)
-        {
-            auto c = fromPixel(row, column);
-
-            bitmapData[row][column]   = iterate(c);
-            bitmapData[row][column+1] = bitmapData[row][column];
-            bitmapData[row][column+2] = bitmapData[row][column];
-            bitmapData[row][column+3] = bitmapData[row][column];
-
-            if(done)
-            {
-                return;
-            }
-        }
-
-        redrawWindow();
-    }
-
-    // other 3 quarters
     for(int row=startRow;row<dim;row+=numThreads)
     {
         for(int column=0;column<dim;column++)
         {
-            if((column % 4) == 0) continue;
-
             auto c = fromPixel(row, column);
 
             bitmapData[row][column] = iterate(c);
@@ -98,10 +73,39 @@ void mandlebrot(int startRow)
 
         redrawWindow();
     }
-
-
-
 }
+
+
+
+void mandlebrotLowRes()
+{
+    constexpr int lowResolution{10};
+    static_assert((dim % lowResolution) == 0);
+
+    for(int row=lowResolution;row<dim;row+=lowResolution)
+    {
+        for(int column=0;column<dim;column+=lowResolution)
+        {
+            auto c = fromPixel(row, column);
+
+            bitmapData[row][column]   = iterate(c);
+
+            for(int i=0;i<lowResolution;i++)
+            {
+                for(int j=0;j<lowResolution;j++)
+                {
+                    bitmapData[row+j][column+i] = bitmapData[row][column];
+                }
+            }
+
+            if(done)
+            {
+                return;
+            }
+        }
+    }
+}
+
 
 
 void go()
@@ -130,6 +134,9 @@ void go()
 
 
     memset(bitmapData,0,sizeof(bitmapData));
+
+    theThreads[numThreads] = std::thread{mandlebrotLowRes};
+
 
     for(int i=0;i<numThreads;i++)
     {
