@@ -8,12 +8,17 @@
 #include <thread>
 #include <complex>
 
+std::thread  theThread;
 
-double left   {-2.0};
-double right  { 0.5};
+std::complex<double>  topLeft;
+std::complex<double>  bottomRight;
 
-double top    { 1.0};
-double bottom {-1.0};
+
+std::complex<double>  fromPixel(int row, int column)
+{
+    return {  topLeft.real()  + column  * (bottomRight.real() -topLeft.real() ) / dim,
+              topLeft.imag()  + row     * (bottomRight.imag() -topLeft.imag() ) / dim };
+}
 
 
 int iterate(std::complex<double> const &c)
@@ -44,21 +49,50 @@ void mandlebrot()
     {
         for(int column=0;column<dim;column++)
         {
-            std::complex<double>    c{  left + column  * (right-left) / dim,
-                                        top  + row     * (bottom-top) / dim };
+            auto c = fromPixel(row, column);
+
 
             bitmapData[row][column] = iterate(c);
-            redrawWindow();
+
+            if(done)
+            {
+                return;
+            }
+
         }
+
+        redrawWindow();
     }
 }
 
+
+void go(std::complex<double> const &topLeft,std::complex<double> const &bottomRight)
+{
+    auto title = std::format("Mandlebrot {},{}  to  {},{}",topLeft.real(), topLeft.imag(), bottomRight.real(), bottomRight.imag());
+
+    setTitle(title);
+
+    ::topLeft=topLeft;
+    ::bottomRight=bottomRight;
+
+    theThread = std::thread{mandlebrot};
+}
+
+void stop()
+{
+    done=true;
+    theThread.join();
+    done=false;
+}
 
 int main()
 {
     createWindow();
 
-    std::thread{mandlebrot}.detach();
+    go( {-2.0, 1.0}, { 0.5, -1.0} );
 
+  
     windowMessageLoop();
+
+    stop();
 }

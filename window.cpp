@@ -1,6 +1,7 @@
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <Windowsx.h>
 
 #include <cassert>
 #include <thread>
@@ -10,6 +11,7 @@ using namespace std::literals;
 
 #include "bitmap.h"
 #include "window.h"
+#include "mandlebrot.h"
 
 std::atomic_bool    done        {false};
 
@@ -45,6 +47,8 @@ void paint(HWND h,WPARAM w, LPARAM l)
 
 LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l)
 {
+    static  int downX, downY;
+
     switch(m)
     {
     case WM_CREATE:
@@ -71,6 +75,34 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l)
     case WM_REFRESH:
         InvalidateRect(h,nullptr,FALSE);
         return 0;
+
+    case WM_LBUTTONDOWN:
+
+        downX = GET_X_LPARAM(l);
+        downY = GET_Y_LPARAM(l);
+
+        break;
+
+    case WM_LBUTTONUP:
+    {
+        
+        auto upX = GET_X_LPARAM(l);
+        auto upY = GET_Y_LPARAM(l);
+
+        if(   upX != downX
+           && upY != downY)
+        {
+            stop();
+
+            auto topLeft     = fromPixel( downY,downX);
+            auto bottomRight = fromPixel( upY,upX);
+
+            go(topLeft,bottomRight);
+
+        }
+    
+        break;
+    }
     
     case WM_NCHITTEST:
     case WM_MOUSEMOVE:
@@ -114,7 +146,7 @@ void createWindow()
     theWindow = CreateWindowA(Class.lpszClassName,
                               "Mandlebrot",
                               windowStyle,
-                              CW_USEDEFAULT,CW_USEDEFAULT,
+                              0,0,
                               10,10,
                               nullptr,
                               nullptr,
@@ -142,4 +174,9 @@ void windowMessageLoop()
 void redrawWindow()
 {
     PostMessage(theWindow,WM_REFRESH,0,0);
+}
+
+void setTitle(std::string const &title)
+{
+    SetWindowText(theWindow,title.c_str());
 }

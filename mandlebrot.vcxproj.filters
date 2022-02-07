@@ -32,11 +32,11 @@
     <ClInclude Include="print.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="geometry.h">
+    <ClInclude Include="bitmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bitmap.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="mandlebrot.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
