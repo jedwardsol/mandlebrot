@@ -1,6 +1,8 @@
 #pragma once
 #include <complex>
 
-std::complex<double>  fromPixel(int row, int column);
-void go(std::complex<double> const &topLeft,std::complex<double> const &bottomRight);
+using Point = std::complex<long double>;
+
+Point  fromPixel(int row, int column);
+void go(Point const &topLeft,Point const &bottomRight);
 void stop();

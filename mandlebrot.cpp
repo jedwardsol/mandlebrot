@@ -7,23 +7,24 @@
 
 #include <thread>
 #include <complex>
+#include "mandlebrot.h"
 
 std::thread  theThread;
 
-std::complex<double>  topLeft;
-std::complex<double>  bottomRight;
+Point  topLeft;
+Point  bottomRight;
 
 
-std::complex<double>  fromPixel(int row, int column)
+Point  fromPixel(int row, int column)
 {
     return {  topLeft.real()  + column  * (bottomRight.real() -topLeft.real() ) / dim,
               topLeft.imag()  + row     * (bottomRight.imag() -topLeft.imag() ) / dim };
 }
 
 
-int iterate(std::complex<double> const &c)
+int iterate(Point const &c)
 {
-    std::complex<double>  z{0,0};
+    Point  z{0,0};
 
     int count{};
 
@@ -66,9 +67,9 @@ void mandlebrot()
 }
 
 
-void go(std::complex<double> const &topLeft,std::complex<double> const &bottomRight)
+void go(Point const &topLeft,Point const &bottomRight)
 {
-    auto title = std::format("Mandlebrot {},{}  to  {},{}",topLeft.real(), topLeft.imag(), bottomRight.real(), bottomRight.imag());
+    auto title = std::format("Mandlebrot {}  to  {}",topLeft.real(), topLeft.imag(), bottomRight.real(), bottomRight.imag());
 
     setTitle(title);
 
