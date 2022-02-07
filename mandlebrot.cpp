@@ -11,9 +11,10 @@
 #include <complex>
 #include "mandlebrot.h"
 
-std::array<std::thread,4>   theThreads;
-Point                       topLeft;
-Point                       bottomRight;
+constexpr int                       numThreads{6};
+std::array<std::thread,numThreads>  theThreads;
+Point                               topLeft;
+Point                               bottomRight;
 
 
 Point  fromPixel(int row, int column)
@@ -46,7 +47,7 @@ int iterate(Point const &c)
 
 void mandlebrot(int startRow)
 {
-    for(int row=startRow;row<dim;row+=4)
+    for(int row=startRow;row<dim;row+=numThreads)
     {
         for(int column=0;column<dim;column++)
         {
@@ -81,10 +82,10 @@ void go(Point const &topLeft,Point const &bottomRight)
 
     memset(bitmapData,0,sizeof(bitmapData));
 
-    theThreads[0] = std::thread{mandlebrot,0};
-    theThreads[1] = std::thread{mandlebrot,1};
-    theThreads[2] = std::thread{mandlebrot,2};
-    theThreads[3] = std::thread{mandlebrot,3};
+    for(int i=0;i<numThreads;i++)
+    {
+        theThreads[i] = std::thread{mandlebrot,i};
+    }
 }
 
 void stop()

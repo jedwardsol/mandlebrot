@@ -5,7 +5,8 @@
 
 //using Point = std::complex<double>;
 //using Point = boost::multiprecision::cpp_complex_double;
-using Point = boost::multiprecision::cpp_complex_quad;
+//using Point = boost::multiprecision::cpp_complex_quad;
+using Point = boost::multiprecision::cpp_complex_oct;
 
 Point  fromPixel(int row, int column);
 void go(Point const &topLeft,Point const &bottomRight);
