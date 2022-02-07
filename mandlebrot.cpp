@@ -58,12 +58,32 @@ int iterate(Point const &c)
 
 void mandlebrot(int startRow)
 {
+    // half resolution
     for(int row=startRow;row<dim;row+=numThreads)
     {
-        for(int column=0;column<dim;column++)
+        for(int column=0;column<dim;column+=2)
         {
             auto c = fromPixel(row, column);
 
+            bitmapData[row][column]   = iterate(c);
+            bitmapData[row][column+1] = bitmapData[row][column];
+
+            if(done)
+            {
+                return;
+            }
+
+        }
+
+        redrawWindow();
+    }
+
+    // other half 
+    for(int row=startRow;row<dim;row+=numThreads)
+    {
+        for(int column=1;column<dim;column+=2)
+        {
+            auto c = fromPixel(row, column);
 
             bitmapData[row][column] = iterate(c);
 
@@ -76,6 +96,9 @@ void mandlebrot(int startRow)
 
         redrawWindow();
     }
+
+
+
 }
 
 
