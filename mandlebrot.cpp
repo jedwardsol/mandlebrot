@@ -28,13 +28,12 @@ int iterate(Point const &c)
 
     int count{};
 
-
     while(count < 256)
     {
         z= z*z + c;
         count++;            
 
-        if(std::abs(z) > 2.0)
+        if(abs(z) > 2.0)
         {
             return count;
         }
@@ -69,7 +68,7 @@ void mandlebrot()
 
 void go(Point const &topLeft,Point const &bottomRight)
 {
-    auto title = std::format("Mandlebrot {}  to  {}",topLeft.real(), topLeft.imag(), bottomRight.real(), bottomRight.imag());
+    auto title = "Mandlebrot";//std::format("Mandlebrot {}  to  {}",topLeft.real(), topLeft.imag(), bottomRight.real(), bottomRight.imag());
 
     setTitle(title);
 
