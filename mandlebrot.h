@@ -3,7 +3,7 @@
 #include <boost/multiprecision/cpp_complex.hpp>
 
 
-//using Point = std::complex<long double>;
+//using Point = std::complex<double>;
 //using Point = boost::multiprecision::cpp_complex_double;
 using Point = boost::multiprecision::cpp_complex_quad;
 

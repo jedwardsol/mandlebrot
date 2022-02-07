@@ -173,7 +173,7 @@ void windowMessageLoop()
 
 void redrawWindow()
 {
-    PostMessage(theWindow,WM_REFRESH,0,0);
+    SendMessage(theWindow,WM_REFRESH,0,0);
 }
 
 void setTitle(std::string const &title)

@@ -1,5 +1,7 @@
 #include <Windows.h>
 #include <vector>
+#include <array>
+#include <string>
 
 #include "bitmap.h"
 #include "window.h"
@@ -9,10 +11,9 @@
 #include <complex>
 #include "mandlebrot.h"
 
-std::thread  theThread;
-
-Point  topLeft;
-Point  bottomRight;
+std::array<std::thread,4>   theThreads;
+Point                       topLeft;
+Point                       bottomRight;
 
 
 Point  fromPixel(int row, int column)
@@ -43,9 +44,9 @@ int iterate(Point const &c)
 
 }
 
-void mandlebrot()
+void mandlebrot(int startRow)
 {
-    for(int row=0;row<dim;row++)
+    for(int row=startRow;row<dim;row+=4)
     {
         for(int column=0;column<dim;column++)
         {
@@ -68,20 +69,32 @@ void mandlebrot()
 
 void go(Point const &topLeft,Point const &bottomRight)
 {
-    auto title = "Mandlebrot";//std::format("Mandlebrot {}  to  {}",topLeft.real(), topLeft.imag(), bottomRight.real(), bottomRight.imag());
+    using std::to_string;
+
+    auto title = std::format("Mandlebrot {},{} to  {},{}",to_string(topLeft.real()),     to_string(topLeft.imag()), 
+                                                          to_string(bottomRight.real()), to_string(bottomRight.imag()));
 
     setTitle(title);
 
     ::topLeft=topLeft;
     ::bottomRight=bottomRight;
 
-    theThread = std::thread{mandlebrot};
+    memset(bitmapData,0,sizeof(bitmapData));
+
+    theThreads[0] = std::thread{mandlebrot,0};
+    theThreads[1] = std::thread{mandlebrot,1};
+    theThreads[2] = std::thread{mandlebrot,2};
+    theThreads[3] = std::thread{mandlebrot,3};
 }
 
 void stop()
 {
     done=true;
-    theThread.join();
+    
+    for(auto &thread : theThreads)
+    {
+        thread.join();
+    }
     done=false;
 }
 
