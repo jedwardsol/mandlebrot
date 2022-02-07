@@ -80,7 +80,6 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l)
 
         downX = GET_X_LPARAM(l);
         downY = GET_Y_LPARAM(l);
-
         break;
 
     case WM_LBUTTONUP:
@@ -104,6 +103,12 @@ LRESULT CALLBACK proc(HWND h, UINT m, WPARAM w, LPARAM l)
         break;
     }
     
+
+    case WM_RBUTTONUP:
+        goUp();
+        break;
+
+
     case WM_NCHITTEST:
     case WM_MOUSEMOVE:
     case WM_NCMOUSEMOVE:

@@ -2,6 +2,8 @@
 #include <vector>
 #include <array>
 #include <string>
+#include <sstream>
+#include <stack>
 
 #include "bitmap.h"
 #include "window.h"
@@ -13,14 +15,23 @@
 
 constexpr int                       numThreads{6};
 std::array<std::thread,numThreads>  theThreads;
-Point                               topLeft;
-Point                               bottomRight;
+
+
+struct Box
+{
+    Point                               topLeft;
+    Point                               bottomRight;
+};
+
+std::stack<Box> history;
 
 
 Point  fromPixel(int row, int column)
 {
-    return {  topLeft.real()  + column  * (bottomRight.real() -topLeft.real() ) / dim,
-              topLeft.imag()  + row     * (bottomRight.imag() -topLeft.imag() ) / dim };
+    auto &current=history.top();
+
+    return {  current.topLeft.real()  + column  * (current.bottomRight.real() -current.topLeft.real() ) / dim,
+              current.topLeft.imag()  + row     * (current.bottomRight.imag() -current.topLeft.imag() ) / dim };
 }
 
 
@@ -68,17 +79,30 @@ void mandlebrot(int startRow)
 }
 
 
-void go(Point const &topLeft,Point const &bottomRight)
+void go()
 {
-    using std::to_string;
+    using std::abs;
 
-    auto title = std::format("Mandlebrot {},{} to  {},{}",to_string(topLeft.real()),     to_string(topLeft.imag()), 
-                                                          to_string(bottomRight.real()), to_string(bottomRight.imag()));
+    auto &current=history.top();
+
+    auto width  = abs(current.bottomRight.real() - current.topLeft.real());
+    auto height = abs(current.bottomRight.imag() - current.topLeft.imag());
+
+    auto stringise = [](auto const &val)
+    {
+        std::ostringstream  s;
+
+        s<<val;
+
+        return s.str();
+    };
+
+
+    auto title = std::format("Mandlebrot width {}  height {}",stringise(width),stringise(height));
 
     setTitle(title);
 
-    ::topLeft=topLeft;
-    ::bottomRight=bottomRight;
+
 
     memset(bitmapData,0,sizeof(bitmapData));
 
@@ -86,7 +110,28 @@ void go(Point const &topLeft,Point const &bottomRight)
     {
         theThreads[i] = std::thread{mandlebrot,i};
     }
+
 }
+
+void go(Point const &topLeft,Point const &bottomRight)
+{
+
+    history.emplace(topLeft,bottomRight);
+
+    go();
+}
+
+
+void goUp()
+{
+    if(history.size() > 1)
+    {
+        stop();
+        history.pop();
+        go();
+    }
+}
+
 
 void stop()
 {
