@@ -5,17 +5,10 @@
 #include <Windows.h>
 #include <cstdint>
 
-
-constexpr int dim{1000};
-
-// palette entries
-enum Colour
-{
-    set         = 255,
-
-};
-
+constexpr int dim{800};
 
 extern BITMAPINFO     *bitmapHeader;
 extern uint8_t         bitmapData[dim][dim];
 
+
+void palette();

@@ -143,6 +143,8 @@ void createWindow()
         "mandlebrot"
     };
 
+    std::thread{palette}.detach();
+
     if(!RegisterClassA(&Class))
     {
         throw std::system_error{ static_cast<int>(GetLastError()), std::system_category(), "RegisterClass"};
@@ -178,7 +180,7 @@ void windowMessageLoop()
 
 void redrawWindow()
 {
-    SendMessage(theWindow,WM_REFRESH,0,0);
+    PostMessage(theWindow,WM_REFRESH,0,0);
 }
 
 void setTitle(std::string const &title)

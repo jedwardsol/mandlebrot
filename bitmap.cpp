@@ -6,8 +6,12 @@
 #include <utility>
 #include <mutex>
 #include <cassert>
+#include <thread>
+#include <chrono>
+using namespace std::literals;
 
 #include "bitmap.h"
+#include "window.h"
 
 
 namespace
@@ -106,10 +110,36 @@ auto makeHeader()
     return header;
 }
 
+
+
+}
+
+BITMAPINFO     *bitmapHeader        {makeHeader()};
+
+void palette()
+{
+    int j{};
+
+    for(;;)
+    {
+        std::this_thread::sleep_for(20ms);
+
+        for(int i=1;i<256;i++)
+        {
+            auto H = 1 + ((i + j) % 255);
+
+            bitmapHeader->bmiColors[i]= fromHSL(H/256.0,.99,0.5);
+        }
+
+        j++;
+        redrawWindow();            
+
+    }
+
+
 }
 
 
-BITMAPINFO     *bitmapHeader        {makeHeader()};
 uint8_t         bitmapData[dim][dim]{};
 //                               ^---- must be multiple of 4
 
